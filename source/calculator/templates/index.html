@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}Price Calculator{% endblock %}
+{% block content %}
+
+      <!-- banner section end -->
+      <div class="banner_section layout_padding">
+         <div id="main_slider" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+               <div class="carousel-item active">
+                  <div class="container">
+                     <div class="row">
+                        <div class="col-md-6">
+                           <h1 class="banner_taital">Taste of <span style="color: #f3801f;">AI</span></h1>
+                        </div>
+                        <div class="col-md-6">
+                           <div><img src="../static/images/img-1.png" class="image_1"></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="carousel-item">
+                  <div class="container">
+                     <div class="row">
+                        <div class="col-md-6">
+                           <h1 class="banner_taital">Taste of <span style="color: #f3801f;">AI</span></h1>
+                        </div>
+                        <div class="col-md-6">
+                           <div><img src="../static/images/img-1.png" class="image_1"></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="carousel-item">
+                  <div class="container">
+                     <div class="row">
+                        <div class="col-md-6">
+                           <h1 class="banner_taital">Taste of <span style="color: #f3801f;">AI</span></h1>
+                        </div>
+                        <div class="col-md-6">
+                           <div><img src="../static/images/img-1.png" class="image_1"></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <a class="carousel-control-prev" href="#main_slider" role="button" data-slide="next">
+               <i class="fa fa-angle-left"></i>
+            </a>
+            <a class="carousel-control-next" href="#main_slider" role="button" data-slide="next">
+               <i class="fa fa-angle-right"></i>
+            </a>
+         </div>
+      </div>
+
+      <!-- banner section end -->
+   </div>
+   <!-- header section end -->
+   <!-- about section start -->
+   <div class="about_section layout_padding">
+      <div id="my_main_slider" class="carousel slide" data-ride="carousel">
+         <div class="carousel-inner">
+            <div class="carousel-item active">
+               <div class="container">
+                  <div class="row">
+                     <div class="col-md-6">
+                        <div class="about_main">
+                           <h1 class="about_taital">About Us</h1>
+                           <p class="about_text">Combining our deep, global experience and leveraging the latest
+                               technologies to include AI, we build scalable solutions to simplify and drive greater
+                               efficiencies.
+                           </p>
+                           <div class="readmore_bt"><a href="#">Read More</a></div>
+                        </div>
+                     </div>
+                     <div class="col-md-6 ">
+                        <div class="image_2"><img src="../static/images/img-2.png"></div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="carousel-item">
+               <div class="container">
+                  <div class="row">
+                     <div class="col-md-6">
+                        <div class="about_main">
+                           <h1 class="about_taital">About Us</h1>
+                           <p class="about_text">Future of catering belongs to companies with the drive for technology
+                               innovation to create frictionless service for consumers, delivering value through
+                               automated cash registers.
+                           </p>
+                           <div class="readmore_bt"><a href="#">Read More</a></div>
+                        </div>
+                     </div>
+                     <div class="col-md-6 ">
+                        <div class="image_2"><img src="../static/images/img-2.png"></div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="carousel-item">
+               <div class="container">
+                  <div class="row">
+                     <div class="col-md-6">
+                        <div class="about_main">
+                           <h1 class="about_taital">About Us</h1>
+                           <p class="about_text">Perfect opportunity for catering businesses to build brands, innovate
+                               product sourcing and transform physical caterings into efficient and automated caterings
+                               of the future.
+                           </p>
+                           <div class="readmore_bt"><a href="#">Read More</a></div>
+                        </div>
+                     </div>
+                     <div class="col-md-6 ">
+                        <div class="image_2"><img src="../static/images/img-2.png"></div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <a class="carousel-control-prev" href="#my_main_slider" role="button" data-slide="next">
+            <i class="fa fa-angle-left"></i>
+         </a>
+         <a class="carousel-control-next" href="#my_main_slider" role="button" data-slide="next">
+            <i class="fa fa-angle-right"></i>
+         </a>
+      </div>
+   </div>
+   <!-- about section end -->
+   <!-- contact section start -->
+   <div class="contact_section layout_padding">
+      <div class="container-fluid">
+         <div class="row">
+            <div class="col-md-6">
+               <div class="mail_main">
+                  <h1 class="contact_taital">Contact us</h1>
+                  <form action="{% url 'main' %}" method="POST">
+                      {% csrf_token %}
+                     <div class="form-group">
+                         {{ form.name|add_class:"email-bt" }}
+                     </div>
+                     <div class="form-group">
+                         {{ form.email|add_class:"email-bt" }}
+                     </div>
+                     <div class="form-group">
+                         {{ form.subject|add_class:"email-bt" }}
+                     </div>
+                     <div class="form-group">
+                        {{ form.message|add_class:"email-bt" }}
+                     </div>
+                      <input type="submit" value="Send">
+                  </form>
+               </div>
+            </div>
+            <div class="col-md-6">
+               <div class="map_main">
+                  <div class="map-responsive">
+                     <iframe
+                        src="https://www.google.com/maps/embed/v1/place?key=AIzaSyA0s1a7phLN0iaD6-UE7m4qP-z21pH0eSc&amp;q==Bishkek+Kyrgyzstan"
+                        width="600" height="600" frameborder="0" style="border:0; width: 100%;"
+                        allowfullscreen=""></iframe>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <!-- contact section end -->
+   <!-- footer section start -->
+   <div class="footer_section layout_padding">
+
+            <h1 class="follow_text">Follow Us</h1>
+            <div class="social_icon">
+               <ul>
+                  <li><a href="#"><img src="../static/images/fb-icon.png"></a></li>
+                  <li><a href="#"><img src="../static/images/twitter-icon.png"></a></li>
+                  <li><a href="#"><img src="../static/images/linkedin-icon.png"></a></li>
+                  <li><a href="#"><img src="../static/images/instagram-icon.png"></a></li>
+               </ul>
+            </div>
+         </div>
+
+   <!-- footer section end -->
+   <!-- copyright section start -->
+   <div class="copyright_section">
+      <div class="container">
+         <p class="copyright_text">2023 Begaiym Beksultanaova </p>
+         </p>
+      </div>
+   </div>
+   <!-- copyright section end -->
+   <!-- Javascript files-->
+   <script src="js/jquery.min.js"></script>
+   <script src="js/popper.min.js"></script>
+   <script src="js/bootstrap.bundle.min.js"></script>
+   <script src="js/jquery-3.0.0.min.js"></script>
+   <script src="js/plugin.js"></script>
+   <!-- sidebar -->
+   <script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
+   <script src="js/custom.js"></script>
+   <!-- javascript -->
+   <script src="js/owl.carousel.js"></script>
+   <script src="https:cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+   <script>
+      $(document).ready(function () {
+         $(".fancybox").fancybox({
+            openEffect: "none",
+            closeEffect: "none"
+         });
+
+   </script>
+   <script>
+            $(document).ready(function () {
+               // Add minus icon for collapse element which is open by default
+               $(".collapse.show").each(function () {
+                  $(this).prev(".card-header").find(".fa").addClass("fa-minus").removeClass("fa-plus");
+               });
+
+               // Toggle plus minus icon on show hide of collapse element
+               $(".collapse").on('show.bs.collapse', function () {
+                  $(this).prev(".card-header").find(".fa").removeClass("fa-plus").addClass("fa-minus");
+               }).on('hide.bs.collapse', function () {
+                  $(this).prev(".card-header").find(".fa").removeClass("fa-minus").addClass("fa-plus");
+               });
+            });
+   </script>
+{% endblock %}
