@@ -1,0 +1,55 @@
+# General
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+*.log
+*.swp
+*.swo
+*.bak
+*.sqlite3
+
+# Django specific
+*.log
+*.pot
+*.pyc
+*.pyo
+*.mo
+*.sqlite3
+*.db
+*__pycache__/
+*.egg-info/
+dist/
+build/
+*.bak
+*.sw?
+*~
+db.sqlite3
+media/
+
+# YOLOv5 specific
+yolov5_app/yolov5_weights/
+yolov5_app/static/output/
+yolov5_app/yolov5/runs/
+
+# ResNet50 specific
+resnet50_app/resnet50_weights/
+resnet50_app/static/output/
+resnet50_app/resnet50/runs/
+
+# Virtual environment
+venv/
+myenv/
+env/
+.Python
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS specific
+.DS_Store
+
+# Windows specific
+Thumbs.db
+Desktop.ini
