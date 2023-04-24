@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ user_obj.get_full_name|default:user_obj.username }}{% endblock %}
+{% block content %}
+
+<div class="container mt-5">
+<div class="jumbotron jumbotron-fluid">
+
+  <div class="container">
+    <h1 class="display-4">Profile of: {{ user_obj.get_full_name|default:user_obj.username }}</h1>
+    <p class="lead">Username: {{ user_obj.username }}</p>
+    <p class="lead">Name: {{ user_obj.first_name }}</p>
+    <p class="lead">Last Name: {{ user_obj.last_name }}</p>
+    <p class="lead">Phone Number: {{ user_obj.profile.phone_number }}</p>
+    <p class="lead">Email: {{ user_obj.email }}</p>
+  </div>
+</div>
+
+<br>
+<h3>{{ user_obj.get_full_name|default:user_obj.username }}'s transactions:</h3>
+<form method="get">
+        <label for="is_paid">Filter by payment status:</label>
+        <select name="is_paid" id="is_paid" onchange="this.form.submit();">
+            <option value="" {% if request.GET.is_paid == '' %}selected{% endif %}>All</option>
+            <option value="true" {% if request.GET.is_paid == 'true' %}selected{% endif %}>Paid</option>
+            <option value="false" {% if request.GET.is_paid == 'false' %}selected{% endif %}>Not Paid</option>
+        </select>
+    </form>
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Transaction id</th>
+            <th>Date</th>
+            <th>Positions</th>
+            <th>Total Check</th>
+            <th>Is paid</th>
+        </tr>
+    </thead>
+<tbody>
+{% for transaction in transactions %}
+    <tr>
+        <td>{{ transaction.id }}</td>
+        <td>{{ transaction.created_at }}</td>
+        <td>
+            {% for position in transaction.positions.positions %}
+            {{ position }},
+            {% endfor %}
+        </td>
+        <td>{{ transaction.total_check }}</td>
+         <td style="display: flex; justify-content: center; align-items: center;">
+              <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                {% if transaction.is_paid %}
+                    <i class="fa fa-check-circle" style="color: green;" title="Paid"></i>
+                {% else %}
+                    <i class="fa fa-times-circle" style="color: red;" title="Not Paid"></i>
+                {% endif %}
+            </div>
+         </td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

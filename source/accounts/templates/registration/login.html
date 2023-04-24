@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Update the Project{% endblock %}
+{% block content %}
+<div class="container mt-5" style="width: 370px; height: auto;">
+<form action="" method="post" class="text-center">
+{% csrf_token %}
+  <!-- Email input -->
+  {% if has_error %}
+            <p class="form-error">Incorrect login or password.</p>
+  {% endif %}
+  <div class="form-outline mb-4">
+    <input type="text" id="username"  name="username" class="form-control" />
+    <label class="form-label" for="username">Username</label>
+  </div>
+
+  <!-- Password input -->
+  <div class="form-outline mb-4">
+    <input type="password" id="password" name="password" class="form-control" />
+    <label class="form-label" for="password">Password</label>
+  </div>
+
+  <!-- 2 column grid layout for inline styling -->
+  <div class="row mb-4">
+    <div class="col d-flex justify-content-center">
+      <!-- Checkbox -->
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="form2Example31" checked />
+        <label class="form-check-label" for="form2Example31"> Remember me </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit button -->
+  <button type="submit" class="btn btn-info btn-block mb-4">Sign in</button>
+
+</form>
+
+{% endblock %}

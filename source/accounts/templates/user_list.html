@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}{% endblock %}
+{% block content %}
+    <div class="header-info-block">
+    <h1>Users</h1>
+    {% include 'partial/simple_search.html' %}
+	</div>
+    <div class="container mt-5">
+		<h1>User List</h1>
+		<table class="table table-striped mt-3">
+		<thead>
+				<tr>
+					<th>First Name</th>
+					<th>Last Name</th>
+					<th>Phone Number</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+      {% for user_obj in user_objects %}
+      <tr>
+        <td>{{ user_obj.first_name }}</td>
+        <td>{{ user_obj.last_name }}</td>
+        <td>{{ user_obj.profile.phone_number }}</td>
+        <td><a href="{% url 'detail' user_obj.pk %}" class="btn btn-warning">See more</a></td>
+    </tr>
+      {% endfor %}
+      </tbody>
+    </div>
+{% endblock %}
