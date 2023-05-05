@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -166,69 +165,6 @@ class Scan(FileUploadToMixin, SafeDeleteModel):
         verbose_name_plural = _('Scans')
 
 
-class PositionFeatureVector(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE
-
-    position = models.ForeignKey(
-        verbose_name=_('Position'),
-        to='Position',
-        related_name='featurevectors',
-        related_query_name='featurevector',
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-    file = FileField(
-        verbose_name=_('File'),
-        blank=True,
-        null=True,
-        related_name='featurevector',
-    )
-    feature_vector = ArrayField(
-        verbose_name=_('Position feature vectors'),
-        base_field=models.PositiveBigIntegerField(),
-        blank=True,
-        default=list,
-    )
-
-    class Meta:
-        db_table = 'positionfeaturevector'
-        verbose_name = _('Position feature vector')
-        verbose_name_plural = _('Position feature vectors')
-
-
-class BoundingBox(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE
-
-    scan = models.ForeignKey(
-        verbose_name=_('Scan'),
-        to='Scan',
-        related_name='bboxes',
-        related_query_name='bbox',
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-    position = models.ForeignKey(
-        verbose_name=_('Position'),
-        to='Position',
-        related_name='bboxes',
-        related_query_name='bbox',
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-    coordinates = ArrayField(
-        verbose_name=_('Coordinates'),
-        base_field=ArrayField(
-            models.IntegerField(),
-            size=2,
-        ),
-        blank=True,
-        null=True,
-    )
-
-
 class Position(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE
 
@@ -255,3 +191,25 @@ class Position(SafeDeleteModel):
         db_table = 'position'
         verbose_name = _('Position')
         verbose_name_plural = _('Positions')
+
+
+class ModelFile(TimeStampAbstract, SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE
+    name = models.CharField(
+        verbose_name=_('Position name'),
+        max_length=255,
+        blank=True,
+        null=True,
+    )
+    model = FileField(
+        verbose_name=_('ModelFile'),
+        blank=True,
+        null=True,
+        help_text=_('Trained model'),
+        related_name='modelfile',
+    )
+
+    class Meta:
+        db_table = 'modelfile'
+        verbose_name = _('Model File')
+        verbose_name_plural = _('Model Files')
