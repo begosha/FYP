@@ -91,5 +91,24 @@ class FileAdmin(SafeDeleteAdmin):
     )
     readonly_fields = (
         'id',
-        'file'
+    )
+
+
+@register(models.ModelFile)
+class ModelFileAdmin(SafeDeleteAdmin):
+
+    list_display = (
+        'id',
+        'name',
+    )
+    fields = (
+        'id',
+        'name',
+        'model',
+        'created_at',
+
+    )
+    readonly_fields = (
+        'id',
+        'created_at',
     )

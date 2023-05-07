@@ -1,28 +1,25 @@
-# Create your views here.
-import base64
-import os
-import subprocess
-import uuid
 from pathlib import Path
 from urllib.parse import urlencode
 
-import torch
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
+from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
+from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, ListView, FormView
 
-from object_detection.detect import run
-from object_detection.yolov5 import detect
+from object_classification.detect_and_classify import detect_and_classify
 from . import models, forms
+from .models import User
 
 
-weights_path = 'object_detection/weights/model_200.pt'
+DETECTION_MODEL_PATH = Path('object_detection') / 'weights' / 'model_200.pt'
+CLASSIFICATION_MODEL_PATH = Path('object_classification') / 'weights' / 'resnet50_food.pt'
+CLASSES_FILE_PATH = Path('object_classification') / 'classes.txt'
 
 
 class MainView(FormView):
-
     template_name = 'index.html'
     form_class = forms.MailForm
     success_url = reverse_lazy('main')
@@ -44,21 +41,23 @@ class CashierView(CreateView):
     template_name = 'cash_register.html'
     form_class = forms.FileForm
     model = models.File
-    success_url = reverse_lazy('main')
+    success_url = reverse_lazy('transaction')
 
     def form_valid(self, form):
+        uploaded_file = form.cleaned_data.get("file")
+        if not uploaded_file:
+            messages.warning(self.request, 'Please resubmit the file.')
+            return redirect('cashier')
         file = form.save(commit=False)
         scan = models.Scan.objects.create(image=file)
         file.save()
         scan.save()
-        weights_path = Path('object_detection') / 'weights' / 'model_200.pt'
-        file_path = Path('uploads') / f'{form.cleaned_data["file"]}'
-        output_path = Path('object_detection') / 'static' / 'output'
-        run(weights=weights_path, source=file_path, project=output_path, save_crop=True, save_txt=True)
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        response.set_cookie('file_name', uploaded_file)
+        return response
 
     def get_success_url(self):
-        return reverse('cashier')
+        return reverse('transaction')
 
 
 class PositionView(ListView):
@@ -93,3 +92,75 @@ class PositionView(ListView):
             return self.form.cleaned_data['search']
         return None
 
+
+class TransactionView(CreateView):
+    template_name = 'transaction.html'
+    form_class = forms.TransactionForm
+    model = models.Transaction
+    success_url = reverse_lazy('cashier')
+
+    def get_classification_results(self, request):
+        file_name = request.COOKIES.get('file_name')
+        if file_name is not None:
+            FILE_PATH = Path('uploads') / f'{file_name}'
+            with open(CLASSES_FILE_PATH, 'r') as f:
+                classes = f.read().split()
+            return detect_and_classify(
+                FILE_PATH,
+                file_name,
+                yolov5_model_file=DETECTION_MODEL_PATH,
+                classifier_model_file=CLASSIFICATION_MODEL_PATH,
+                classes=classes,
+            )
+        else:
+            messages.warning(request, 'Please resubmit the file.')
+            return redirect('cashier')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        results, img = self.get_classification_results(self.request)
+        position_names = [position['class_label'] for position in results]
+
+        # Fetch positions using a single query
+        position_queryset = models.Position.objects.filter(name__in=position_names).values('name', 'price')
+
+        # Fetch all positions using a single query
+        all_positions = models.Position.objects.all()
+
+        # Fetch all users using a single query
+        all_users = User.objects.all().prefetch_related('transactions')
+
+        context['positions_classified'] = position_queryset
+        context['positions'] = all_positions
+        context['users'] = all_users
+        context['image_url'] = img
+        return context
+
+    def form_valid(self, form):
+        # Save the transaction instance without committing to the database
+        transaction = form.save(commit=False)
+
+        # Get the user from the form
+        transaction.user = form.cleaned_data['user']
+
+        # Update positions field
+        position_ids = self.request.POST.getlist('positions')
+        positions = []
+        for position_id in position_ids:
+            position = models.Position.objects.get(pk=position_id)
+            positions.append({
+                'name': position.name,
+                'price': position.price
+            })
+        transaction.positions = positions
+
+        # Get the total check from the form
+        transaction.total_check = form.cleaned_data['total_check']
+
+        # Save the transaction instance to the database
+        transaction.save()
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('cashier')

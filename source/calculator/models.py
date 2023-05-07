@@ -196,7 +196,7 @@ class Position(SafeDeleteModel):
 class ModelFile(TimeStampAbstract, SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE
     name = models.CharField(
-        verbose_name=_('Position name'),
+        verbose_name=_('Model name'),
         max_length=255,
         blank=True,
         null=True,

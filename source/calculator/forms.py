@@ -51,3 +51,22 @@ class MailForm(forms.Form):
         widget=forms.TextInput(attrs={'placeholder': 'Message'})
     )
 
+
+class TransactionForm(forms.ModelForm):
+    class Meta:
+        model = models.Transaction
+        fields = ['user', 'positions', 'total_check', 'is_paid']
+        widgets = {
+            'positions': forms.HiddenInput(),
+        }
+
+    def clean_positions(self):
+        position_ids = self.data.getlist('positions')
+        positions = []
+        for position_id in position_ids:
+            position = models.Position.objects.get(pk=position_id)
+            positions.append({
+                'name': position.name,
+                'price': position.price
+            })
+        return positions
