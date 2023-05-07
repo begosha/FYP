@@ -72,6 +72,7 @@ def detect(
 
     result = []
     detected_objects = predictions[0]
+    static_output_path = None
 
     if len(detected_objects):
         detected_objects[:, :4] = scale_boxes(preprocessed_img.shape[2:], detected_objects[:, :4], img.shape).round()
