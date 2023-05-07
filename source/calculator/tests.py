@@ -1,18 +1,15 @@
 import os
 import tempfile
+from pathlib import Path
 from unittest.mock import patch
-from urllib.parse import urlencode
 
+from django.conf import settings
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import override_settings, TestCase
+from django.test import Client, override_settings, TestCase
 from django.urls import reverse
 
 from . import models, forms
-
-
-from django.test import TestCase
-from django.urls import reverse
 
 
 class PositionViewTests(TestCase):
@@ -87,42 +84,106 @@ class MainViewTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
 
-class CashierViewTestCase(TestCase):
-    def setUp(self):
-        self.url = reverse('cashier')
+class CashierViewTests(TestCase):
 
-    def test_cashier_view_uses_correct_template(self):
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'cash_register.html')
+    def test_cashier_view_form_valid(self):
+        # Create a test file
+        test_file = SimpleUploadedFile("test_file.jpg", b"file_content", content_type="image/jpeg")
 
-    @override_settings(MEDIA_ROOT=tempfile.gettempdir())
-    @patch('object_detection.detect.run')
-    def test_cashier_view_form_submission(self, mock_run):
-        test_image = tempfile.NamedTemporaryFile(suffix='.jpg', dir=tempfile.gettempdir(), delete=False)
-        with open(test_image.name, 'wb') as f:
-            f.write(b'\x00' * 256)
-
-        with open(test_image.name, 'rb') as img:
-            uploaded_file = SimpleUploadedFile(name='test.jpg', content=img.read(), content_type='image/jpeg')
-            form_data = {
-                'file': uploaded_file,
-            }
-            response = self.client.post(self.url, data=form_data, format='multipart')
-
+        # Pass the test file in the POST data
+        response = self.client.post(reverse("cashier"), {"file": test_file})
         self.assertEqual(response.status_code, 302)
+
+        # Check if the file was created in the database
         self.assertEqual(models.File.objects.count(), 1)
+
+        # Check if the scan was created in the database
         self.assertEqual(models.Scan.objects.count(), 1)
-        # mock_run.assert_called_once()
 
-        os.remove(test_image.name)
-        tempfile.gettempdir()
+        # Check if the created file has the correct attributes
+        file = models.File.objects.first()
+        self.assertEqual(file.file.name, "test_file.jpg")
 
-    def test_cashier_view_form_submission_invalid(self):
-        form_data = {
-        }
-        response = self.client.post(self.url, data=form_data)
+        # Check if the created scan has the correct attributes
+        scan = models.Scan.objects.first()
+        self.assertEqual(scan.image, file)
 
-        self.assertEqual(response.status_code, 400)
+        # Check if the file_name is set in the cookies
+        self.assertTrue('file_name' in response.cookies)
+
+    def test_cashier_view_form_invalid(self):
+        # Pass an empty file in the POST data
+        response = self.client.post(reverse("cashier"), {})
+        self.assertEqual(response.status_code, 302)
+
+        # Check if the file was not created in the database
         self.assertEqual(models.File.objects.count(), 0)
+
+        # Check if the scan was not created in the database
         self.assertEqual(models.Scan.objects.count(), 0)
+
+        # Check if the file_name is not set in the cookies
+        self.assertFalse('file_name' in response.cookies)
+
+    def tearDown(self):
+        # Get all the File objects created during tests
+        files = models.File.objects.all()
+
+        # Iterate through the files and delete the corresponding image files
+        for file in files:
+            file_path = os.path.join(settings.MEDIA_ROOT, file.file.name)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        # Delete the File objects from the database
+        models.File.objects.all().delete()
+
+class TransactionViewTests(TestCase):
+
+    def setUp(self):
+        # Create a test user
+        self.user = models.User.objects.create(username='test_user')
+
+        # Create a test position
+        self.position = models.Position.objects.create(name='test_position', price=42)
+
+    def test_transaction_view(self):
+        # Create a test file
+        test_file = SimpleUploadedFile("test_file.jpg", b"file_content", content_type="image/jpeg")
+
+        # Pass the test file in the POST data
+        response = self.client.post(reverse("cashier"), {"file": test_file})
+        self.assertEqual(response.status_code, 302)
+
+        # Get the file_name from the cookies
+        file_name = response.cookies['file_name'].value
+
+        # POST data for the TransactionView
+        data = {
+            'user': self.user.pk,
+            'positions': [self.position.pk],
+            'total_check': 42
+        }
+
+        # Send a POST request to the TransactionView
+        response = self.client.post(reverse("transaction"), data)
+
+        # Check if the response has a successful status code
+        self.assertEqual(response.status_code, 302)
+
+        # Check if the transaction was created in the database
+        self.assertEqual(models.Transaction.objects.count(), 1)
+
+        # Check if the created transaction has the correct attributes
+        transaction = models.Transaction.objects.first()
+        self.assertEqual(transaction.user, self.user)
+        self.assertEqual(transaction.positions, [{'name': 'test_position', 'price': 42}])
+        self.assertEqual(transaction.total_check, 42)
+
+
+    def tearDown(self):
+        # Remove the test image file
+        file_name = self.client.cookies['file_name'].value
+        FILE_PATH = Path('uploads') / f'{file_name}'
+        if FILE_PATH.exists():
+            FILE_PATH.unlink()

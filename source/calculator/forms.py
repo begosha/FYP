@@ -1,5 +1,7 @@
-from django import forms
 from datetime import datetime
+
+from django import forms
+
 from . import models
 
 
@@ -14,12 +16,16 @@ class FileForm(forms.ModelForm):
         widgets = {
             'file': forms.FileInput(attrs={'accept': 'image/*', 'capture': 'camera'})
         }
+        labels = {
+            'file': 'file.jpg'
+        }
 
     def save(self, commit=True):
         instance = super(FileForm, self).save(commit=False)
-        instance.name = f'file_{id}_{str(datetime.now())}'
+        instance.name = f'file_{id}_{str(datetime.now())}.jpg'
         instance.save()
         return instance
+
 
 
 class ScanForm(forms.ModelForm):

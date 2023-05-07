@@ -2,6 +2,11 @@
 {% block title %}Cashier Page{% endblock %}
 {% block content %}
 <div class="cashier-page">
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-warning">{{ message }}</div>
+    {% endfor %}
+{% endif %}
 <div class="header-info-block">
     <h1>Meal Capture</h1>
 	</div>
@@ -10,10 +15,10 @@
 	    <video id="video" autoplay></video>
     </div>
   <div class="form-div col-6 col-md-4">
-  <canvas id="canvas" style="display:none;"></canvas>
-  {#img class="capture-img" id="captured-image" src="" alt="Captured Image"#}
   <div class="form">
-		<form action="{% url 'cashier' %}" enctype="multipart/form-data" method="POST">
+		<form action="{% url 'cashier' %}" enctype="multipart/form-data" method="POST" id="capture-form">
+            {% csrf_token %}
+
 			{% include "partial/form.html" with button_text="UPLOAD" %}
             <button id="take-picture-btn" class="btn">CAPTURE</button>
 		</form>
@@ -21,4 +26,8 @@
 </div>
 
 </div>
+    <script>
+var cashierUrl = "{% url 'cashier' %}";
+</script>
+
 {% endblock %}

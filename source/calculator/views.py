@@ -2,9 +2,7 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 from django.contrib import messages
-from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
-from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, ListView, FormView
@@ -44,16 +42,18 @@ class CashierView(CreateView):
     success_url = reverse_lazy('transaction')
 
     def form_valid(self, form):
-        uploaded_file = form.cleaned_data.get("file")
-        if not uploaded_file:
+        print('aaaaaaaaaa')
+        print(form.cleaned_data)
+        image_data = form.cleaned_data.get("file")
+        if not image_data:
             messages.warning(self.request, 'Please resubmit the file.')
             return redirect('cashier')
-        file = form.save(commit=False)
-        scan = models.Scan.objects.create(image=file)
-        file.save()
+        image_file = form.save(commit=False)
+        scan = models.Scan.objects.create(image=image_file)
+        image_file.save()
         scan.save()
         response = super().form_valid(form)
-        response.set_cookie('file_name', uploaded_file)
+        response.set_cookie('file_name', image_data)
         return response
 
     def get_success_url(self):
@@ -112,13 +112,13 @@ class TransactionView(CreateView):
                 classifier_model_file=CLASSIFICATION_MODEL_PATH,
                 classes=classes,
             )
-        else:
-            messages.warning(request, 'Please resubmit the file.')
-            return redirect('cashier')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         results, img = self.get_classification_results(self.request)
+
+        if not results:
+            self.render_to_response(context)
         position_names = [position['class_label'] for position in results]
 
         # Fetch positions using a single query
@@ -135,6 +135,10 @@ class TransactionView(CreateView):
         context['users'] = all_users
         context['image_url'] = img
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        messages.warning(self.request, 'Please resubmit the file.')
+        return redirect('cashier')
 
     def form_valid(self, form):
         # Save the transaction instance without committing to the database

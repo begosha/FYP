@@ -85,12 +85,15 @@ class FileAdmin(SafeDeleteAdmin):
     )
     fields = (
         'id',
+        'size',
         'file',
         'meta',
 
     )
     readonly_fields = (
         'id',
+        'name',
+        'size',
     )
 
 
