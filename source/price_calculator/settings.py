@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'price_calculator.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'calcdb',
+        'NAME': 'calc_db',
         'USER': 'gosha',
         'PASSWORD': 'debug',
         'HOST': 'localhost',
