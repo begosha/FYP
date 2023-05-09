@@ -114,7 +114,7 @@ def detect(
 
         # Save the output image to a desired location using PIL
         output_path = Path('results') / f"{img_name.replace('.jpg', '')}_result.jpg"
-        static_output_path = Path('uploads') / output_path
+        static_output_path = Path('media') / output_path
         img_pil.save(str(static_output_path))
 
     return result, static_output_path
