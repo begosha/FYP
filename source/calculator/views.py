@@ -42,8 +42,6 @@ class CashierView(CreateView):
     success_url = reverse_lazy('transaction')
 
     def form_valid(self, form):
-        print('aaaaaaaaaa')
-        print(form.cleaned_data)
         image_data = form.cleaned_data.get("file")
         if not image_data:
             messages.warning(self.request, 'Please resubmit the file.')
@@ -102,7 +100,7 @@ class TransactionView(CreateView):
     def get_classification_results(self, request):
         file_name = request.COOKIES.get('file_name')
         if file_name is not None:
-            FILE_PATH = Path('uploads') / f'{file_name}'
+            FILE_PATH = Path('media') / f'{file_name}'
             with open(CLASSES_FILE_PATH, 'r') as f:
                 classes = f.read().split()
             return detect_and_classify(
@@ -136,9 +134,6 @@ class TransactionView(CreateView):
         context['image_url'] = img
         return context
 
-    def render_to_response(self, context, **response_kwargs):
-        messages.warning(self.request, 'Please resubmit the file.')
-        return redirect('cashier')
 
     def form_valid(self, form):
         # Save the transaction instance without committing to the database

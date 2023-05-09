@@ -184,6 +184,6 @@ class TransactionViewTests(TestCase):
     def tearDown(self):
         # Remove the test image file
         file_name = self.client.cookies['file_name'].value
-        FILE_PATH = Path('uploads') / f'{file_name}'
+        FILE_PATH = Path('media') / f'{file_name}'
         if FILE_PATH.exists():
             FILE_PATH.unlink()
