@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from PIL import Image, ImageDraw
 
-from utils.augmentations import letterbox
+from .yolov5.utils.augmentations import letterbox
 from .yolov5.models.common import DetectMultiBackend
 from .yolov5.utils.general import (
     non_max_suppression,
