@@ -2,6 +2,7 @@ from pathlib import Path
 from urllib.parse import urlencode
 
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -35,7 +36,7 @@ class MainView(FormView):
         return super().form_valid(form)
 
 
-class CashierView(CreateView):
+class CashierView(LoginRequiredMixin, CreateView):
     template_name = 'cash_register.html'
     form_class = forms.FileForm
     model = models.File
@@ -58,7 +59,7 @@ class CashierView(CreateView):
         return reverse('transaction')
 
 
-class PositionView(ListView):
+class PositionView(LoginRequiredMixin, ListView):
     template_name = 'positions.html'
     model = models.Position
     paginate_by = 5
@@ -91,7 +92,7 @@ class PositionView(ListView):
         return None
 
 
-class TransactionView(CreateView):
+class TransactionView(LoginRequiredMixin, CreateView):
     template_name = 'transaction.html'
     form_class = forms.TransactionForm
     model = models.Transaction
