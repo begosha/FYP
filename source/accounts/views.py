@@ -1,5 +1,6 @@
 from urllib.parse import urlencode
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.views.generic import DetailView, ListView
@@ -8,7 +9,7 @@ from calculator import models
 from . import forms
 
 
-class UserList(ListView):
+class UserList(LoginRequiredMixin, ListView):
     template_name = 'user_list.html'
     model = User
     paginate_by = 5
@@ -43,7 +44,7 @@ class UserList(ListView):
         return None
 
 
-class UserDetail(DetailView):
+class UserDetail(LoginRequiredMixin, DetailView):
     model = User
     template_name = 'user_detail.html'
     context_object_name = 'user_obj'
