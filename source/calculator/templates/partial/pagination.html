@@ -1,0 +1,46 @@
+<div class="pagination">
+
+    <span class="step-links">
+
+        <a href="?{% if query %}{{ query }}&{% endif %}page=1">&laquo; Start</a>
+
+        {% if page_obj.has_previous %}
+
+            <a href="?{% if query %}{{ query }}&{% endif %}page={{ page_obj.previous_page_number }}">Go Back</a>
+
+        {% else %}
+
+            <span class="page-disabled">Go Back</span>
+
+        {% endif %}
+
+
+        <form class="current-page" method="get">
+
+            <label for="page">
+                {% if search %}<input type="hidden" name="search" value="{{ search }}">{% endif %}
+
+                Page <input type="text" name="page" id="page" value="{{ page_obj.number }}">
+
+                from {{ page_obj.paginator.num_pages }}.
+
+            </label>
+
+        </form>
+
+
+        {% if page_obj.has_next %}
+
+            <a href="?{% if query %}{{ query }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+
+        {% else %}
+
+            <span class="page-disabled">Next</span>
+
+        {% endif %}
+
+        <a href="?{% if query %}{{ query }}&{% endif %}page={{ page_obj.paginator.num_pages }}">End &raquo;</a>
+
+    </span>
+
+</div>

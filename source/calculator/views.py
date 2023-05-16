@@ -62,7 +62,8 @@ class CashierView(LoginRequiredMixin, CreateView):
 class PositionView(LoginRequiredMixin, ListView):
     template_name = 'positions.html'
     model = models.Position
-    paginate_by = 5
+    paginate_by = 8
+    paginate_orphans = 3
     context_object_name = 'positions'
 
     def get(self, request, *args, **kwargs):

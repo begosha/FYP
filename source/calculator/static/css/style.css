@@ -363,7 +363,11 @@ i.fa.fa-angle-right {
 i.fa.fa-angle-left {
     text-align: center;
 }
-
+.pagination {
+    margin: auto;
+    width: 30%;
+    padding: 10px;
+}
 .play_icon {
     width: 100%;
     float: right;
